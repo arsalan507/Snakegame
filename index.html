@@ -2,17 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta
+      name="description"
+      content="SnakeMania — a small arcade snake game built with vanilla HTML, CSS and JavaScript. No frameworks, no build step."
+    />
     <title>SnakeMania</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="css/style.css" />
   </head>
+
   <body>
-    <div class="body">
-      <div id="scoreBox">Score: 0</div>
-      <div id="hiscoreBox">HiScore: 0</div>
-      <div id="board"></div>
-    </div>
+    <main class="shell">
+      <header class="hud">
+        <h1 class="title">SnakeMania</h1>
+
+        <dl class="stats">
+          <div class="stat">
+            <dt>Score</dt>
+            <dd id="score">0</dd>
+          </div>
+          <div class="stat">
+            <dt>Best</dt>
+            <dd id="best">0</dd>
+          </div>
+          <div class="stat">
+            <dt>Speed</dt>
+            <dd id="speed">7.0/s</dd>
+          </div>
+        </dl>
+
+        <button id="mute" class="mute" type="button" aria-label="Mute" aria-pressed="false">
+          🔊
+        </button>
+      </header>
+
+      <div class="stage">
+        <div id="board" class="board" role="application" aria-label="Snake game board"></div>
+
+        <div id="overlay" class="overlay" hidden>
+          <h2 id="overlay-title">SnakeMania</h2>
+          <p id="overlay-body"></p>
+          <button id="overlay-action" class="btn" type="button">Play</button>
+        </div>
+      </div>
+
+      <footer class="legend">
+        <p>
+          <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+          steer &middot; <kbd>Space</kbd> pause &middot; <kbd>M</kbd> mute &middot; swipe on touch
+        </p>
+      </footer>
+    </main>
+
+    <script src="js/index.js"></script>
   </body>
-  <script src="js/index.js"></script>
 </html>

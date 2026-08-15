@@ -1,44 +1,131 @@
-# SnakeGame
-Welcome to SnakeGame, a classic snake game built with HTML, CSS, and JavaScript.
+<div align="center">
 
-## Overview
+# 🐍 SnakeMania
 
-SnakeGame is a simple browser-based game where the player controls a snake. The objective is to eat as much food as possible without colliding with the snake's own body or the walls of the game board. Each time the snake eats food, it grows longer, and the player earns points. The game ends when the snake collides with itself or the wall.
+**A small, fast, dependency-free arcade snake.**
+No frameworks. No build step. No `node_modules`. Just open `index.html`.
 
-## Features
+[**▶ Play it**](https://arsalan507.github.io/Snakegame/) &nbsp;·&nbsp;
+[Controls](#controls) &nbsp;·&nbsp;
+[How it works](#how-it-works) &nbsp;·&nbsp;
+[Run it locally](#run-it-locally)
 
-- Simple and intuitive controls using arrow keys.
-- Dynamic game board with a responsive design.
-- Score tracking with a display of the current score and high score.
-- Audio effects for different game events (e.g., eating food, game over).
+![SnakeMania gameplay](docs/screenshot.jpg)
 
-## Installation
+![HTML5](https://img.shields.io/badge/HTML5-e34f26?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572b6?style=flat-square&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?style=flat-square&logo=javascript&logoColor=black)
+![Dependencies](https://img.shields.io/badge/dependencies-0-3fb950?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
-1. Clone this repository to your local machine:
+</div>
+
+---
+
+## The game
+
+Steer the snake, eat the food, don't hit the walls or yourself. Every meal makes
+you longer **and** faster — the board never changes size, so the difficulty comes
+entirely from the space you've already eaten your way through.
+
+Your best score is kept in `localStorage`, so it survives a refresh.
+
+## Controls
+
+| Action | Keyboard | Touch |
+| --- | --- | --- |
+| Steer | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> | Swipe on the board |
+| Start / restart | <kbd>Space</kbd>, <kbd>Enter</kbd>, or any direction | Tap **Play** |
+| Pause / resume | <kbd>Space</kbd> or <kbd>P</kbd> | Tap **Resume** |
+| Mute | <kbd>M</kbd> | 🔊 button |
+
+Switching away from the tab pauses automatically, so you don't lose a run to a
+notification.
+
+## Run it locally
+
+There is no build step and nothing to install.
+
+```bash
+git clone https://github.com/arsalan507/Snakegame.git
+cd Snakegame
+```
+
+Then either open `index.html` directly, or serve the folder so the audio loads
+without `file://` restrictions:
+
+```bash
+python3 -m http.server 8000
+# → http://localhost:8000
+```
+
+## How it works
+
+The whole game is ~300 lines of vanilla JavaScript in [`js/index.js`](js/index.js).
+Four decisions do most of the work:
+
+**A fixed-timestep loop.** `requestAnimationFrame` fires at whatever rate the
+display runs at, which is not a game speed. An accumulator converts those frames
+into a fixed number of *moves per second*, so the snake travels at the same pace
+on a 60 Hz laptop and a 144 Hz monitor:
+
+```js
+accumulator += dt;
+while (accumulator >= 1 / speed) {
+  accumulator -= 1 / speed;
+  step();
+}
+```
+
+`dt` is clamped, so a backgrounded tab can't bank ten seconds of time and then
+fast-forward the snake into a wall on return.
+
+**A turn queue instead of a direction variable.** Writing the new direction
+straight into `dir` lets two fast taps — right, then up, then left, all inside a
+single move — fold the snake back into its own neck. Turns are queued and
+validated against *the last queued turn* rather than the live direction, so an
+illegal reversal is impossible no matter how fast you mash:
+
+```js
+const last = queued.length ? queued[queued.length - 1] : dir;
+if (d.x === -last.x && d.y === -last.y) return; // no 180s
+```
+
+**Food is drawn from the free cells.** The naive approach — pick random
+coordinates, retry if occupied — gets slower exactly when the board is fullest,
+and never terminates on a full board. Instead the free cells are collected and
+one is chosen directly, which is uniform, always terminates, and gives the
+perfect-game ending for free when the list comes back empty.
+
+**The board is built once.** The grid is `COLS * ROWS` cells created at boot;
+each move re-classes only the cells that changed, rather than tearing down and
+rebuilding the DOM every frame.
+
+## Project structure
 
 ```
-git clone <repository-url>
+Snakegame/
+├── index.html        # markup: HUD, board mount, overlay
+├── css/style.css     # theme tokens, responsive grid board, overlay
+├── js/index.js       # the entire game
+├── img/              # background art
+├── music/            # sound effects and loop
+└── docs/             # screenshot used by this README
 ```
 
-2. Open the index.html file in your web browser.
+## Roadmap
 
-## Usage
-
-- Use the arrow keys (up, down, left, right) to control the snake's direction.
-- Eat food to increase your score.
-- Avoid colliding with the snake's body or the walls.
-- Try to achieve the highest score possible!
+- [ ] Wrap-around walls as a selectable mode
+- [ ] Obstacle tiles at higher scores
+- [ ] On-screen D-pad as a swipe alternative
+- [ ] Colour-blind-safe palette toggle
 
 ## Credits
 
-- Background image: [Unsplash](https://unsplash.com/)
-- Fonts: [Google Fonts](https://fonts.google.com/)
-- Sounds: [Freesound](https://freesound.org/)
+- Fonts — [Google Fonts](https://fonts.google.com/) (Space Grotesk)
+- Sound effects — [Freesound](https://freesound.org/)
+- Background art — [Unsplash](https://unsplash.com/)
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Acknowledgements
-
-Special thanks to [OpenAI](https://openai.com/) for providing guidance and assistance.
+[MIT](LICENSE) © Arsalan Ahmed
